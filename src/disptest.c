@@ -53,6 +53,13 @@ static void test_SysAllocStringLen(void)
 	ok(!_fmemcmp(bstr, "testt\0est", 10), "SysAllocStringLen failed\n");
 	ok(SysStringLen(bstr) == 9, "SysStringLen(SysAllocStringLen) failed(%ld)\n", (DWORD)SysStringLen(bstr));
 	SysFreeString(bstr);
+
+	bstr = SysAllocStringLen("TESTTEST", 3);
+	ok(bstr != NULL, "SysAllocStringLen failed\n");
+	ok(get_blob(bstr)->clSize == 3, "SysAllocStringLen failed(%ld)\n", (DWORD)get_blob(bstr)->clSize);
+	ok(!_fmemcmp(bstr, "TES", 4), "SysAllocStringLen failed\n");
+	ok(SysStringLen(bstr) == 3, "SysStringLen(SysAllocStringLen) failed(%ld)\n", (DWORD)SysStringLen(bstr));
+	SysFreeString(bstr);
 }
 static void test_SysAllocString(void)
 {
@@ -105,28 +112,38 @@ static void test_SysReAllocStringLen(void)
 	BSTR bstr;
 	bstr = SysAllocString("test");
 	SysReAllocStringLen((BSTR FAR*)&bstr, "TESTA", 5);
-	ok(!_fmemcmp(bstr, "TESTA", 6), "SysReAllocStringLen failed");
+	ok(!_fmemcmp(bstr, "TESTA", 6), "SysReAllocStringLen failed\n");
 	ok(get_blob(bstr)->clSize == 5, "SysReAllocStringLen failed(%ld)\n", (DWORD)get_blob(bstr)->clSize);
 	ok(SysStringLen(bstr) == 5, "SysStringLen(SysReAllocStringLen) failed(%ld)\n", (DWORD)SysStringLen(bstr));
 	SysFreeString(bstr);
 
 	bstr = SysAllocString("test");
 	SysReAllocStringLen((BSTR FAR*)&bstr, NULL, 1);
-	ok(bstr == NULL, "SysReAllocStringLen(&bstr, NULL, 1) must be fail\n");
+	ok(bstr != NULL, "SysReAllocStringLen(&bstr, NULL, 1) failed\n");
+	ok(get_blob(bstr)->clSize == 1, "SysReAllocStringLen failed(%ld)\n", (DWORD)get_blob(bstr)->clSize);
+	ok(SysStringLen(bstr) == 1, "SysStringLen(SysReAllocStringLen) failed(%ld)\n", (DWORD)SysStringLen(bstr));
 	SysFreeString(bstr);
 
 	bstr = SysAllocString("test");
 	SysReAllocStringLen((BSTR FAR*)&bstr, "A", 1);
-	ok(!_fmemcmp(bstr, "A", 2), "SysReAllocStirng failed");
+	ok(!_fmemcmp(bstr, "A", 2), "SysReAllocStirng failed\n");
 	ok(get_blob(bstr)->clSize == 1, "SysReAllocStringLen failed(%ld)\n", (DWORD)get_blob(bstr)->clSize);
 	ok(SysStringLen(bstr) == 1, "SysStringLen(SysReAllocStringLen) failed(%ld)\n", (DWORD)SysStringLen(bstr));
 	SysFreeString(bstr);
 
 	bstr = SysAllocString("test");
 	SysReAllocStringLen((BSTR FAR*)&bstr, "A\0B", 3);
-	ok(!_fmemcmp(bstr, "A\0B", 4), "SysReAllocStirng failed");
+	ok(!_fmemcmp(bstr, "A\0B", 4), "SysReAllocStirng failed\n");
 	ok(get_blob(bstr)->clSize == 3, "SysReAllocStringLen failed(%ld)\n", (DWORD)get_blob(bstr)->clSize);
 	ok(SysStringLen(bstr) == 3, "SysStringLen(SysReAllocStringLen) failed(%ld)\n", (DWORD)SysStringLen(bstr));
+	SysFreeString(bstr);
+
+	bstr = SysAllocString("test");
+	SysReAllocStringLen((BSTR FAR*)&bstr, "TESTTEST", 3);
+	ok(bstr != NULL, "SysReAllocStringLen failed\n");
+	ok(get_blob(bstr)->clSize == 3, "SysReAllocStringLen failed(%ld)\n", (DWORD)get_blob(bstr)->clSize);
+	ok(!_fmemcmp(bstr, "TES", 4), "SysReAllocStringLen failed\n");
+	ok(SysStringLen(bstr) == 3, "SysReAllocStringLen(SysAllocStringLen) failed(%ld)\n", (DWORD)SysStringLen(bstr));
 	SysFreeString(bstr);
 }
 START_TEST(ole2disp)
@@ -135,4 +152,5 @@ START_TEST(ole2disp)
 	test_SysAllocStringLen();
 	test_SysAllocString();
 	test_SysReAllocString();
+	test_SysReAllocStringLen();
 }
