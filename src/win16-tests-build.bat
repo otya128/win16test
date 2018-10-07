@@ -35,3 +35,6 @@ wlink file timer.obj
 
 wcc %opt% window.c
 wlink file window.obj
+
+wcc %opt% disptest.c
+wlink file disptest.obj
