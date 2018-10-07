@@ -85,7 +85,7 @@ static void test_Window(void)
     ok(GetCapture() == SetCapture(hwnd), "SetCapture failed!\n");
     ok(GetCapture() == hwnd, "GetCapture failed!\n");
     ReleaseCapture();
-    ok(GetCapture() == NULL, "ReleaseCapture() failed!\n");
+    ok(GetCapture() == 0, "ReleaseCapture() failed!\n");
 
     /* Focus */
     SetFocus(hwnd2);
@@ -233,7 +233,8 @@ static void test_GetUpdateRect(void)
     WNDCLASS cls;
     const char *classNameA = "GetUpdateRectClass";
     hgrandparent =
-        CreateWindow("static", "grandparent", WS_OVERLAPPEDWINDOW, 0, 0, 100,
+        CreateWindow("static", "grandparent", WS_OVERLAPPEDWINDOW, 0, 0, 
+100,
                      100, NULL, NULL, 0, NULL);
     hparent =
         CreateWindow("static", "parent", WS_CHILD | WS_VISIBLE, 0, 0, 100, 100,

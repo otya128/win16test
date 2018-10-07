@@ -54,7 +54,8 @@ static void test_Global(void)
         mem2ptr = GlobalLock(mem2);
         mem2_long = mem2 & 0xffff;
         mem2_long = mem2_long << 16;
-        ok(mem2_long == mem2ptr,
+    	/* fail win31JP win8 WOW32 */
+        ok(mem2_long == (char FAR*)mem2ptr,
            "GlobalLock should have returned the same memory as was allocated\n");
         if (mem2ptr) {
             error = 0;
@@ -80,7 +81,7 @@ static void test_Global(void)
     }
     /* Check that ReAllocing memory works as expected */
     mem2a = GlobalReAlloc(mem2, 2 * memchunk, GMEM_MOVEABLE | GMEM_ZEROINIT);
-    ok(mem2a != NULL, "GlobalReAlloc failed\n");
+    ok(mem2a != 0, "GlobalReAlloc failed\n");
     if (mem2a) {
         ok(GlobalSize(mem2a) >= 2 * memchunk, "GlobalReAlloc failed\n");
         mem2ptr = GlobalLock(mem2a);
@@ -102,7 +103,7 @@ static void test_Global(void)
 
             /* Check that we can't discard locked memory */
             mem2b = GlobalDiscard(mem2a);
-            if (mem2b == NULL) {
+            if (mem2b == 0) {
                 GlobalUnlock(mem2a);
                 ok(!GlobalUnlock(mem2a)
                    && GetLastError() == NO_ERROR, "GlobalUnlock Failed\n");
@@ -110,12 +111,12 @@ static void test_Global(void)
         }
     }
     if (mem1) {
-        ok(GlobalFree(mem1) == NULL, "GlobalFree failed\n");
+        ok(GlobalFree(mem1) == 0, "GlobalFree failed\n");
     }
     if (mem2a) {
-        ok(GlobalFree(mem2a) == NULL, "GlobalFree failed\n");
+        ok(GlobalFree(mem2a) == 0, "GlobalFree failed\n");
     } else {
-        ok(GlobalFree(mem2) == NULL, "GlobalFree failed\n");
+        ok(GlobalFree(mem2) == 0, "GlobalFree failed\n");
     }
 }
 
@@ -130,7 +131,7 @@ static void test_Local(void)
 
     /* Check that a normal alloc works */
     mem1 = LocalAlloc(0, memchunk);
-    ok(mem1 != NULL, "LocalAlloc failed: error=%d\n", GetLastError());
+    ok(mem1 != 0, "LocalAlloc failed: error=%d\n", GetLastError());
     if (mem1) {
         ok(LocalSize(mem1) >= memchunk,
            "LocalAlloc should return a big enough memory block\n");
@@ -138,7 +139,7 @@ static void test_Local(void)
 
     /* Check that a 'zeroing' and lock alloc works */
     mem2 = LocalAlloc(LMEM_ZEROINIT | LMEM_MOVEABLE, memchunk);
-    ok(mem2 != NULL, "LocalAlloc failed: error=%d\n", GetLastError());
+    ok(mem2 != 0, "LocalAlloc failed: error=%d\n", GetLastError());
     if (mem2) {
         ok(LocalSize(mem2) >= memchunk,
            "LocalAlloc should return a big enough memory block\n");
@@ -161,16 +162,16 @@ static void test_Local(void)
         }
     }
     mem2a = LocalFree(mem2);
-    ok(mem2a == NULL, "LocalFree failed: %p\n", mem2a);
+    ok(mem2a == 0, "LocalFree failed: %p\n", mem2a);
 
     /* Reallocate mem2 as moveable memory */
     mem2 = LocalAlloc(LMEM_MOVEABLE | LMEM_ZEROINIT, memchunk);
-    ok(mem2 != NULL, "LocalAlloc failed to create moveable memory, error=%d\n",
+    ok(mem2 != 0, "LocalAlloc failed to create moveable memory, error=%d\n",
        GetLastError());
 
     /* Check that ReAllocing memory works as expected */
     mem2a = LocalReAlloc(mem2, 2 * memchunk, LMEM_MOVEABLE | LMEM_ZEROINIT);
-    ok(mem2a != NULL, "LocalReAlloc failed, error=%d\n", GetLastError());
+    ok(mem2a != 0, "LocalReAlloc failed, error=%d\n", GetLastError());
     if (mem2a) {
         ok(LocalSize(mem2a) >= 2 * memchunk, "LocalReAlloc failed\n");
         mem2ptr = LocalLock(mem2a);
@@ -192,19 +193,19 @@ static void test_Local(void)
                "LocalHandle didn't return the correct memory handle\n");
             /* Check that we can't discard locked memory */
             mem2b = LocalDiscard(mem2a);
-            ok(mem2b == NULL, "Discarded memory we shouldn't have\n");
+            ok(mem2b == 0, "Discarded memory we shouldn't have\n");
             SetLastError(NO_ERROR);
             ok(!LocalUnlock(mem2a)
                && GetLastError() == NO_ERROR, "LocalUnlock Failed\n");
         }
     }
     if (mem1) {
-        ok(LocalFree(mem1) == NULL, "LocalFree failed\n");
+        ok(LocalFree(mem1) == 0, "LocalFree failed\n");
     }
     if (mem2a) {
-        ok(LocalFree(mem2a) == NULL, "LocalFree failed\n");
+        ok(LocalFree(mem2a) == 0, "LocalFree failed\n");
     } else {
-        ok(LocalFree(mem2) == NULL, "LocalFree failed\n");
+        ok(LocalFree(mem2) == 0, "LocalFree failed\n");
     }
 }
 
